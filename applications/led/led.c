@@ -16,6 +16,9 @@
 #include <rtdbg.h>
 #include <rtthread.h>
 #include <rtdevice.h>
+#include <string.h>
+
+#include <device_config.h>
 
 /* 引脚编号，通过查看驱动文件drv_gpio.c确定 */
 #ifndef LED0_PIN_NUM
@@ -75,16 +78,41 @@ void led0_thread_entry(void *parameter)
     }
     return;
 }
-
+#if KEY_DEVICE
+extern struct rt_mailbox key_mb;
+#endif
 void led1_thread_entry(void *parameter)
 {
+    char *str;
+
     led1_init();
     while(1)
     {
+#if KEY_DEVICE
+        /* 从邮箱中收取邮件 */
+        if (rt_mb_recv(&key_mb, (uint32_t *)&str, RT_WAITING_FOREVER) == RT_EOK)
+        {
+            rt_kprintf("get a key mailbox, the content:%s\n", str);
+            if (!strcmp(str,"key_up"))
+            {
+                rt_kprintf("key_up press down! \n");
+            }
+            else if(!strcmp(str,"key0"))
+            {
+                led1_on();
+            }
+            else if(!strcmp(str,"key1"))
+            {
+                led1_off();
+            }
+        }
+#else
         led1_on();
         rt_thread_mdelay(500);
         led1_off();
-        rt_thread_mdelay(500);
+        rt_thread_mdelay(400);
+#endif
+        rt_thread_mdelay(100);
     }
     return;
 }
