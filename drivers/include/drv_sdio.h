@@ -21,6 +21,7 @@
 #include <drivers/sdio.h>
 
 #ifdef BSP_USING_SDIO
+#define SDIO_USING_1_BIT
 
 #if defined(SOC_SERIES_STM32F1) || defined(SOC_SERIES_STM32F2) || defined(SOC_SERIES_STM32F4)
 #define SDCARD_INSTANCE_TYPE              SDIO_TypeDef
@@ -38,7 +39,7 @@
 #define SDIO_ALIGN_LEN       32
 
 #ifndef SDIO_MAX_FREQ
-#define SDIO_MAX_FREQ        (1000000)
+#define SDIO_MAX_FREQ        (48000000)
 #endif
 
 #ifndef SDIO_BASE_ADDRESS
